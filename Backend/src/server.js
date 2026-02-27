@@ -16,11 +16,15 @@ if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
 }
 
-const PORT = config.port;
+const PORT = process.env.PORT || config.port || 5000;
 
 async function startServer() {
     try {
         // DB connection
+        console.log("🔍 Starting server...");
+        console.log("PORT =", PORT);
+        console.log("DATABASE_URL exists =", !!process.env.DATABASE_URL);
+
         await prisma.$connect();
         logger.info('✅ Database connection established', {
             environment: config.nodeEnv,
@@ -30,8 +34,8 @@ async function startServer() {
             logger.info(`🚀 Server started`, {
                 port: PORT,
                 environment: config.nodeEnv,
-                docsUrl: `http://localhost:${PORT}/api/docs`,
-                healthUrl: `http://localhost:${PORT}/health`,
+                docsUrl: `/api/docs`,
+                healthUrl: `/health`,
             });
         });
 
