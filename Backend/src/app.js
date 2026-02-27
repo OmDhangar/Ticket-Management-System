@@ -20,7 +20,7 @@ const app = express();
 app.use(helmet());
 app.use(
     cors({
-        origin: [config.cors.origin],
+        origin: config.cors.origin,
         methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id'],
         exposedHeaders: ['x-request-id'],

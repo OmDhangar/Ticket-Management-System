@@ -17,12 +17,13 @@ import { createAuditLog } from '../repositories/auditLog.repository.js';
 export const createNewTicket = async ({ actorId, actorRole, body }) => {
     const { title, description, priority, dueDate, assigneeId } = body;
 
-    // Only admins can assign on create
+    // Only admins can assign a ticket to someone else during creation.
+    // Regular users always get self-assigned.
     if (assigneeId && actorRole !== 'ADMIN') {
-        throw new AppError('Only admins can assign tickets during creation.', 403);
+        throw new AppError('Only admins can assign tickets to other users during creation.', 403);
     }
 
-    // Validate assignee exists if provided
+    // Validate assignee exists if an explicit one was provided (admin flow)
     if (assigneeId) {
         const assignee = await findUserById(assigneeId);
         if (!assignee) {
@@ -30,13 +31,16 @@ export const createNewTicket = async ({ actorId, actorRole, body }) => {
         }
     }
 
+    // Regular users are self-assigned; admins can leave unassigned or pick someone.
+    const resolvedAssigneeId = assigneeId ?? (actorRole !== 'ADMIN' ? actorId : null);
+
     const ticket = await createTicket({
         title,
         description,
         priority: priority || 'MEDIUM',
         dueDate: dueDate ? new Date(dueDate) : null,
         creatorId: actorId,
-        assigneeId: assigneeId || null,
+        assigneeId: resolvedAssigneeId,
     });
 
     // Audit log
@@ -184,9 +188,11 @@ export const changeTicketStatus = async ({ ticketId, actorId, actorRole, status 
         throw new AppError('Ticket not found.', 404);
     }
 
-    // Admins can change any ticket; users can change only if they are the assignee
-    if (actorRole !== 'ADMIN' && ticket.assigneeId !== actorId) {
-        throw new AppError('Only the assigned user or an admin can change ticket status.', 403);
+    // Admins can change any ticket; users can change if they are the creator OR the assignee
+    const isCreator = ticket.creatorId === actorId;
+    const isAssignee = ticket.assigneeId === actorId;
+    if (actorRole !== 'ADMIN' && !isCreator && !isAssignee) {
+        throw new AppError('Only the ticket creator, assigned user, or an admin can change ticket status.', 403);
     }
 
     const previousStatus = ticket.status;
