@@ -1,6 +1,6 @@
 import { AppError } from '../middlewares/errorHandler.middleware.js';
 import { logDomainEvent } from '../utils/logger.js';
-import { buildPaginatedResponse } from '../utils/response.js';
+import { buildPaginatedResponse, parsePagination } from '../utils/response.js';
 import { findUserById } from '../repositories/user.repository.js';
 import {
     createTicket,
@@ -87,8 +87,8 @@ export const getTicketById = async ({ ticketId, actorId, actorRole }) => {
  * List tickets with filters
  */
 export const listAllTickets = async ({ actorId, actorRole, query }) => {
-    const { status, priority, assigneeId, createdBy, page, limit } = query;
-    const skip = (page - 1) * limit;
+    const { status, priority, assigneeId, createdBy, search, myTickets } = query;
+    const { page, limit, skip } = parsePagination(query);
 
     // Base where clause: never show soft-deleted tickets
     const where = { isDeleted: false };
@@ -99,9 +99,24 @@ export const listAllTickets = async ({ actorId, actorRole, query }) => {
     if (assigneeId) where.assigneeId = assigneeId;
     if (createdBy) where.creatorId = createdBy;
 
-    // Users only see tickets they created or are assigned to
+    // Full-text search across title and description
+    if (search) {
+        where.OR = [
+            { title: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+        ];
+    }
+
+    // Users only see tickets they created or are assigned to.
+    // Admins see everything UNLESS myTickets=true ("My Tickets" view).
     if (actorRole !== 'ADMIN') {
-        where.OR = [{ creatorId: actorId }, { assigneeId: actorId }];
+        where.AND = [
+            ...(where.AND || []),
+            { OR: [{ creatorId: actorId }, { assigneeId: actorId }] },
+        ];
+    } else if (myTickets === 'true') {
+        // Admin requested their own tickets only
+        where.creatorId = actorId;
     }
 
     const { tickets, total } = await listTickets({ where, skip, take: limit });
