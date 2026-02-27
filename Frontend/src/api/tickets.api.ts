@@ -7,7 +7,7 @@ export interface Ticket {
   status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
   priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
   assignee?: { id: string; name: string; email: string } | null;
-  createdBy: { id: string; name: string; email: string };
+  creator: { id: string; name: string; email: string };
   dueDate?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -18,7 +18,7 @@ export interface TicketFilters {
   status?: string;
   priority?: string;
   assigneeId?: string;
-  createdBy?: string;
+  creatorId?: string;
   page?: number;
   limit?: number;
   search?: string;

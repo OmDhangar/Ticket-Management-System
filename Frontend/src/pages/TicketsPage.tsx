@@ -190,7 +190,7 @@ export default function TicketsPage() {
                   <TableCell><PriorityBadge priority={t.priority} /></TableCell>
                   {isAllTicketsView && (
                     <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
-                      {t.createdBy?.name || <span className="italic text-muted-foreground/50">Unknown</span>}
+                      {t.creator?.name || <span className="italic text-muted-foreground/50">Unknown</span>}
                     </TableCell>
                   )}
                   <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
@@ -239,8 +239,8 @@ function TicketCard({ ticket: t, onClick, showCreator }: { ticket: Ticket; onCli
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-medium text-foreground line-clamp-2 text-sm">{t.title}</h3>
         </div>
-        {showCreator && t.createdBy && (
-          <p className="text-xs text-muted-foreground">By: {t.createdBy.name}</p>
+        {showCreator && t.creator && (
+          <p className="text-xs text-muted-foreground">By: {t.creator.name}</p>
         )}
         {t.description && <p className="text-xs text-muted-foreground line-clamp-2">{t.description}</p>}
         <div className="flex flex-wrap items-center gap-2">

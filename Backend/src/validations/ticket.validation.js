@@ -76,6 +76,8 @@ export const ticketQuerySchema = z.object({
     priority: priorityEnum.optional(),
     assigneeId: z.string().uuid().optional(),
     createdBy: z.string().uuid().optional(),
+    search: z.string().trim().optional(),
+    myTickets: z.enum(['true', 'false']).optional(),
     page: z
         .string()
         .optional()

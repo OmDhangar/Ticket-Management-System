@@ -1,6 +1,6 @@
 # 🎫 Ticket Management System
 
-A full-stack Ticket Management System with a production-ready REST API (Node.js, Express, PostgreSQL, Prisma) and a React frontend.
+A full-stack Ticket Management System with a production-ready REST API (Node.js, Express, PostgreSQL, Prisma) and a React + Vite frontend with role-based views.
 
 ---
 
@@ -24,6 +24,8 @@ A full-stack Ticket Management System with a production-ready REST API (Node.js,
 
 ## 🛠 Tech Stack
 
+### Backend
+
 | Technology       | Purpose                          |
 |------------------|----------------------------------|
 | Node.js 20 LTS   | Runtime                          |
@@ -38,10 +40,24 @@ A full-stack Ticket Management System with a production-ready REST API (Node.js,
 | Swagger / OpenAPI| API documentation at `/api/docs` |
 | Docker           | Containerization                 |
 
+### Frontend
+
+| Technology       | Purpose                              |
+|------------------|--------------------------------------|
+| React 18         | UI framework                         |
+| Vite             | Dev server + bundler                 |
+| TypeScript       | Type safety                          |
+| React Router v6  | Client-side routing                  |
+| TanStack Query   | Server state caching + fetching      |
+| Zustand          | Auth store (JWT + user)              |
+| shadcn/ui        | Component library (Radix + Tailwind) |
+| Axios            | HTTP client                          |
+
 ---
 
 ## ✨ Features
 
+### Backend
 - ✅ JWT authentication (register + login)
 - ✅ Role-based access control: **ADMIN** and **USER**
 - ✅ Full Ticket CRUD with soft delete
@@ -57,99 +73,110 @@ A full-stack Ticket Management System with a production-ready REST API (Node.js,
 - ✅ Docker + docker-compose (api + postgres)
 - ✅ Graceful shutdown
 
+### Frontend
+- ✅ Login / Register pages with JWT-backed auth
+- ✅ Persistent auth via Zustand + localStorage
+- ✅ **My Tickets** view — tickets created by or assigned to the logged-in user
+- ✅ **All Tickets** view — admin-only; shows every ticket across all users
+- ✅ **Created By** column — displays the originating user's name for each ticket
+- ✅ Ticket detail page with inline title/description editing
+- ✅ Comment thread per ticket
+- ✅ Admin: assign tickets, change status, delete
+- ✅ Filter by status, priority, full-text search
+- ✅ Pagination
+- ✅ Table and card view modes
+
 ---
 
 ## 📁 Project Structure
 
 ```
 ticket-management-system/
-├── src/
-│   ├── config/
-│   │   ├── database.js       # Prisma singleton
-│   │   ├── env.js            # Env var validation + config
-│   │   └── swagger.js        # OpenAPI spec config
-│   ├── controllers/          # Thin — delegate to services
-│   │   ├── auth.controller.js
-│   │   ├── user.controller.js
-│   │   ├── ticket.controller.js
-│   │   └── comment.controller.js
-│   ├── services/             # Business logic
-│   │   ├── auth.service.js
-│   │   ├── user.service.js
-│   │   ├── ticket.service.js
-│   │   └── comment.service.js
-│   ├── repositories/         # DB access only
-│   │   ├── user.repository.js
-│   │   ├── ticket.repository.js
-│   │   ├── comment.repository.js
-│   │   └── auditLog.repository.js
-│   ├── middlewares/
-│   │   ├── auth.middleware.js          # JWT verify + role check
-│   │   ├── validate.middleware.js      # Zod validation factory
-│   │   ├── requestLogger.middleware.js # Request logging + requestId
-│   │   └── errorHandler.middleware.js  # Global error handler + AppError
-│   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── user.routes.js
-│   │   └── ticket.routes.js
-│   ├── validations/
-│   │   ├── auth.validation.js
-│   │   ├── ticket.validation.js
-│   │   └── comment.validation.js
-│   ├── utils/
-│   │   ├── jwt.js            # Token generation + verification
-│   │   ├── logger.js         # Winston logger
-│   │   └── response.js       # Standardized response helpers
-│   ├── app.js                # Express app setup
-│   └── server.js             # Entry point
-├── prisma/
-│   ├── schema.prisma         # Database schema
-│   ├── seed.js               # Seed admin + demo user
-│   └── migrations/           # SQL migrations
-├── logs/
-│   ├── combined.log          # All logs
-│   └── error.log             # Error-level only
-├── .env.example
-├── .gitignore
-├── .dockerignore
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
+├── Backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── database.js           # Prisma singleton
+│   │   │   ├── env.js                # Env var validation
+│   │   │   └── swagger.js            # OpenAPI spec config
+│   │   ├── controllers/              # Thin — delegate to services
+│   │   │   ├── auth.controller.js
+│   │   │   ├── user.controller.js
+│   │   │   ├── ticket.controller.js
+│   │   │   └── comment.controller.js
+│   │   ├── services/                 # Business logic
+│   │   │   ├── auth.service.js
+│   │   │   ├── user.service.js
+│   │   │   ├── ticket.service.js
+│   │   │   └── comment.service.js
+│   │   ├── repositories/             # DB access only
+│   │   │   ├── user.repository.js
+│   │   │   ├── ticket.repository.js
+│   │   │   ├── comment.repository.js
+│   │   │   └── auditLog.repository.js
+│   │   ├── middlewares/
+│   │   │   ├── auth.middleware.js          # JWT verify + role check
+│   │   │   ├── validate.middleware.js      # Zod validation factory
+│   │   │   ├── requestLogger.middleware.js # Request logging + requestId
+│   │   │   └── errorHandler.middleware.js  # Global error handler
+│   │   ├── routes/
+│   │   │   ├── auth.routes.js
+│   │   │   ├── user.routes.js
+│   │   │   └── ticket.routes.js
+│   │   ├── validations/
+│   │   │   ├── auth.validation.js
+│   │   │   ├── ticket.validation.js
+│   │   │   └── comment.validation.js
+│   │   ├── utils/
+│   │   │   ├── jwt.js            # Token generation + verification
+│   │   │   ├── logger.js         # Winston logger
+│   │   │   └── response.js       # Standardized response helpers
+│   │   ├── app.js
+│   │   └── server.js
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   ├── seed.js
+│   │   └── migrations/
+│   ├── logs/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── .env.example
+│
+└── Frontend/
+    ├── src/
+    │   ├── api/               # Typed Axios wrappers (tickets, auth, users)
+    │   ├── components/        # Shared UI + feature components
+    │   ├── hooks/             # TanStack Query hooks (useTickets, useComments…)
+    │   ├── pages/             # Route-level page components
+    │   ├── store/             # Zustand auth store
+    │   ├── utils/             # formatDate, cn helpers
+    │   └── router/            # React Router config + protected routes
+    ├── index.html
+    └── vite.config.ts
 ```
 
 ---
 
 ## 🔐 Environment Variables
 
-Copy `.env.example` to `.env`:
+### Backend — copy `.env.example` to `.env`:
 
-```bash
-cp .env.example .env
-```
+| Variable             | Required | Default                     | Description                       |
+|----------------------|----------|-----------------------------|-----------------------------------|
+| `NODE_ENV`           | No       | `development`               | `development` or `production`     |
+| `PORT`               | No       | `5000`                      | HTTP server port                  |
+| `DATABASE_URL`       | **Yes**  | —                           | PostgreSQL connection string      |
+| `JWT_SECRET`         | **Yes**  | —                           | Secret key for JWT signing        |
+| `JWT_EXPIRES_IN`     | No       | `1h`                        | JWT token lifetime                |
+| `CORS_ORIGIN`        | No       | `http://localhost:5173`     | Allowed CORS origin               |
+| `LOG_LEVEL`          | No       | `info`                      | Winston log level                 |
+| `SEED_ADMIN_EMAIL`   | No       | `admin@demo.com`            | Admin seed email                  |
+| `SEED_ADMIN_PASSWORD`| No       | `AdminPass123!`             | Admin seed password               |
 
-| Variable            | Required | Default              | Description                        |
-|---------------------|----------|----------------------|------------------------------------|
-| `NODE_ENV`          | No       | `development`        | `development` or `production`      |
-| `PORT`              | No       | `5000`               | HTTP server port                   |
-| `DATABASE_URL`      | **Yes**  | —                    | PostgreSQL connection string       |
-| `JWT_SECRET`        | **Yes**  | —                    | Secret key for JWT signing         |
-| `JWT_EXPIRES_IN`    | No       | `1h`                 | JWT token lifetime                 |
-| `CORS_ORIGIN`       | No       | `http://localhost:3000` | Allowed CORS origin             |
-| `LOG_LEVEL`         | No       | `info`               | Winston log level                  |
-| `SEED_ADMIN_EMAIL`  | No       | `admin@demo.com`     | Admin seed email                   |
-| `SEED_ADMIN_PASSWORD`| No      | `AdminPass123!`      | Admin seed password                |
+### Frontend — copy `Frontend/.env.example` to `Frontend/.env`:
 
-### Example `.env`:
-
-```env
-NODE_ENV=development
-PORT=5000
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ticket_db?schema=public"
-JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
-JWT_EXPIRES_IN=1h
-CORS_ORIGIN=http://localhost:3000
-LOG_LEVEL=info
-```
+| Variable        | Default                        | Description           |
+|-----------------|--------------------------------|-----------------------|
+| `VITE_API_URL`  | `http://localhost:5000/api/v1` | Backend API base URL  |
 
 ---
 
@@ -159,107 +186,97 @@ LOG_LEVEL=info
 - Node.js 20+
 - PostgreSQL 14+ running locally
 
-### Steps
+### Backend
 
 ```bash
-# 1. Clone and install
-git clone <repo-url>
-cd ticket-management-system
+cd Backend
+
+# 1. Install dependencies
 npm install
 
 # 2. Configure environment
 cp .env.example .env
 # Edit .env — set DATABASE_URL and JWT_SECRET
 
-# 3. Run database migrations
+# 3. Run migrations
 npx prisma migrate dev --name init
 
 # 4. Generate Prisma client
 npx prisma generate
 
-# 5. Seed the database (creates admin + demo user)
+# 5. Seed the database
 npm run seed
 
-# 6. Start development server (with file watching)
+# 6. Start dev server
 npm run dev
 ```
 
-The API will be available at: **http://localhost:5000**  
-Swagger UI: **http://localhost:5000/api/docs**
+API: **http://localhost:5000**  
+Swagger: **http://localhost:5000/api/docs**
 
 ---
 
 ## 🖥 Frontend Setup
 
-### Prerequisites
-- Node.js 18+
-
-### Steps
-
 ```bash
-# From the repo root
 cd Frontend
 
 # Install dependencies
 npm install
 
-# Configure environment
+# Configure environment (defaults work out of the box with backend on port 5000)
 cp .env.example .env
-# The default .env.example already points at the backend:
-# VITE_API_URL=http://localhost:5000/api/v1
 
-# Start development server
+# Start dev server
 npm run dev
 ```
 
-The UI will be available at: **http://localhost:8080**
+UI: **http://localhost:5173**
 
-Log in with the seeded credentials (see below). A regular user can register, create tickets, update their own tickets, and add comments. Admin features (assign, delete, user list) require the ADMIN role.
+### Roles in the UI
+
+| Role  | Capabilities |
+|-------|-------------|
+| USER  | Create tickets (self-assigned), view own tickets, comment, update own tickets |
+| ADMIN | Full access: view all tickets, assign tickets, change any status, delete tickets, view all users. Has "My Tickets" / "All Tickets" tab switcher. |
 
 ---
 
-No local PostgreSQL needed — everything runs in containers.
+## 🐳 Running with Docker
+
+No local PostgreSQL needed.
 
 ```bash
-# 1. Clone the repo
-git clone <repo-url>
-cd ticket-management-system
+cd Backend
 
-# 2. Build and start all services
+# Build and start all services
 docker-compose up --build
 
-# Services started:
-# - postgres  → port 5432 (internal: ticket_db)
+# Services:
+# - postgres  → port 5432
 # - api       → http://localhost:5000
-# - seed      → runs once, then exits (creates admin user)
+# - seed      → runs once, then exits
 ```
 
-> **Note:** The first startup may take 30–60 seconds while the database initializes and migrations run.
-
-### Useful Docker commands:
+> **Note:** First startup may take 30–60 seconds while the database initialises.
 
 ```bash
 # Run in background
 docker-compose up -d --build
 
-# View logs
+# View API logs
 docker-compose logs -f api
 
 # Stop all
 docker-compose down
 
-# Stop and remove volumes (wipe database)
+# Wipe database
 docker-compose down -v
-
-# Re-run seed manually
-docker-compose run --rm seed
 ```
 
 ---
 
 ## 🔑 Seeded Credentials
-
-After running `npm run seed` or `docker-compose up`, these accounts exist:
 
 | Role  | Email            | Password       |
 |-------|------------------|----------------|
@@ -274,86 +291,74 @@ Base URL: `http://localhost:5000/api/v1`
 Interactive docs: `http://localhost:5000/api/docs`
 
 ### Auth
-| Method | Endpoint                  | Auth | Description          |
-|--------|---------------------------|------|----------------------|
-| POST   | `/auth/register`          | No   | Register new user    |
-| POST   | `/auth/login`             | No   | Login, get JWT       |
+| Method | Endpoint         | Auth | Description       |
+|--------|------------------|------|-------------------|
+| POST   | `/auth/register` | No   | Register new user |
+| POST   | `/auth/login`    | No   | Login, get JWT    |
 
 ### Users
-| Method | Endpoint       | Auth       | Description           |
-|--------|----------------|------------|-----------------------|
-| GET    | `/users`       | ADMIN only | List all users        |
-| GET    | `/users/:id`   | ADMIN only | Get user by ID        |
+| Method | Endpoint     | Auth       | Description      |
+|--------|--------------|------------|------------------|
+| GET    | `/users`     | ADMIN only | List all users   |
+| GET    | `/users/:id` | ADMIN only | Get user by ID   |
 
 ### Tickets
-| Method | Endpoint                   | Auth              | Description                         |
-|--------|----------------------------|-------------------|-------------------------------------|
-| POST   | `/tickets`                 | Any authenticated | Create ticket                       |
-| GET    | `/tickets`                 | Any authenticated | List tickets (scoped by role)       |
-| GET    | `/tickets/:id`             | Any authenticated | Get ticket detail + comments        |
-| PATCH  | `/tickets/:id`             | Creator or ADMIN  | Update ticket fields                |
-| POST   | `/tickets/:id/assign`      | ADMIN only        | Assign/reassign ticket              |
-| POST   | `/tickets/:id/status`      | ADMIN or Assignee | Change ticket status                |
-| DELETE | `/tickets/:id`             | ADMIN only        | Soft delete ticket                  |
+| Method | Endpoint                   | Auth              | Description                          |
+|--------|----------------------------|-------------------|--------------------------------------|
+| POST   | `/tickets`                 | Any authenticated | Create ticket                        |
+| GET    | `/tickets`                 | Any authenticated | List tickets (scoped by role/filter) |
+| GET    | `/tickets/:id`             | Any authenticated | Ticket detail + comments             |
+| PATCH  | `/tickets/:id`             | Creator or ADMIN  | Update ticket fields                 |
+| POST   | `/tickets/:id/assign`      | ADMIN only        | Assign / reassign ticket             |
+| POST   | `/tickets/:id/status`      | ADMIN or Assignee | Change ticket status                 |
+| DELETE | `/tickets/:id`             | ADMIN only        | Soft delete ticket                   |
+
+#### `GET /tickets` — Query Parameters
+
+| Param       | Type   | Description                                                              |
+|-------------|--------|--------------------------------------------------------------------------|
+| `status`    | enum   | Filter by status: `OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`           |
+| `priority`  | enum   | Filter by priority: `LOW`, `MEDIUM`, `HIGH`, `URGENT`                   |
+| `assigneeId`| UUID   | Filter by assignee                                                       |
+| `createdBy` | UUID   | Filter by creator                                                        |
+| `search`    | string | Full-text search across title and description                            |
+| `myTickets` | bool   | **Admin only** — `true` to see only tickets created by the admin        |
+| `page`      | number | Page number (default: 1)                                                 |
+| `limit`     | number | Page size (default: 10, max: 100)                                        |
+
+**Scoping rules:**
+- Regular users always see only tickets they created or are assigned to.
+- Admins see all tickets by default; add `myTickets=true` for "My Tickets" view.
 
 ### Comments
-| Method | Endpoint                   | Auth              | Description              |
-|--------|----------------------------|-------------------|--------------------------|
-| POST   | `/tickets/:id/comments`    | Ticket member     | Add comment              |
-| GET    | `/tickets/:id/comments`    | Ticket member     | List comments            |
+| Method | Endpoint                | Auth          | Description       |
+|--------|-------------------------|---------------|-------------------|
+| POST   | `/tickets/:id/comments` | Ticket member | Add comment       |
+| GET    | `/tickets/:id/comments` | Ticket member | List comments     |
 
 ---
 
 ## 🧪 Sample cURL Requests
 
-### 1. Register a new user
+### 1. Register
 
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/register \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Jane Doe",
-    "email": "jane@example.com",
-    "password": "MyPass123!"
-  }'
+  -d '{"name":"Jane Doe","email":"jane@example.com","password":"MyPass123!"}'
 ```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Account created successfully.",
-  "data": {
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "email": "jane@example.com",
-      "name": "Jane Doe",
-      "role": "USER",
-      "isActive": true
-    }
-  }
-}
-```
-
----
 
 ### 2. Login
 
 ```bash
 curl -X POST http://localhost:5000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@demo.com",
-    "password": "AdminPass123!"
-  }'
+  -d '{"email":"admin@demo.com","password":"AdminPass123!"}'
 ```
 
-> Copy the `accessToken` from the response. Use it as `Bearer <token>` in all subsequent requests.
+> Copy the `accessToken`. Use as `Bearer <token>` in subsequent requests.
 
----
-
-### 3. Create a ticket (as any user)
+### 3. Create a ticket
 
 ```bash
 export TOKEN="<your_access_token>"
@@ -361,66 +366,56 @@ export TOKEN="<your_access_token>"
 curl -X POST http://localhost:5000/api/v1/tickets \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "title": "Login button not working",
-    "description": "The login button on the homepage does not respond when clicked on Chrome v120.",
-    "priority": "HIGH",
-    "dueDate": "2025-06-30T23:59:59.000Z"
-  }'
+  -d '{"title":"Login button not working","description":"The login button does not respond on Chrome v120.","priority":"HIGH"}'
 ```
 
----
-
-### 4. List tickets (as admin — sees all)
+### 4. List all tickets (admin)
 
 ```bash
 curl -X GET "http://localhost:5000/api/v1/tickets?page=1&limit=10" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### List tickets with filters
+### 4a. List only the admin's own tickets
 
 ```bash
-curl -X GET "http://localhost:5000/api/v1/tickets?status=OPEN&priority=HIGH&page=1&limit=5" \
+curl -X GET "http://localhost:5000/api/v1/tickets?myTickets=true" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
----
+### 4b. Search with filters
 
-### 5. Get a ticket by ID
+```bash
+curl -X GET "http://localhost:5000/api/v1/tickets?search=login&status=OPEN&priority=HIGH" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### 5. Get a ticket
 
 ```bash
 export TICKET_ID="<ticket_uuid>"
-
 curl -X GET "http://localhost:5000/api/v1/tickets/$TICKET_ID" \
   -H "Authorization: Bearer $TOKEN"
 ```
-
----
 
 ### 6. Assign a ticket (admin only)
 
 ```bash
 export USER_ID="<user_uuid>"
-
 curl -X POST "http://localhost:5000/api/v1/tickets/$TICKET_ID/assign" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d "{\"assigneeId\": \"$USER_ID\"}"
 ```
 
----
-
-### 7. Change ticket status (admin or assignee)
+### 7. Change status
 
 ```bash
 curl -X POST "http://localhost:5000/api/v1/tickets/$TICKET_ID/status" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"status": "IN_PROGRESS"}'
+  -d '{"status":"IN_PROGRESS"}'
 ```
-
----
 
 ### 8. Add a comment
 
@@ -428,10 +423,8 @@ curl -X POST "http://localhost:5000/api/v1/tickets/$TICKET_ID/status" \
 curl -X POST "http://localhost:5000/api/v1/tickets/$TICKET_ID/comments" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"content": "I can reproduce this on Firefox too. Looks like a JS error."}'
+  -d '{"content":"I can reproduce this on Firefox too."}'
 ```
-
----
 
 ### 9. Update ticket fields (creator or admin)
 
@@ -439,10 +432,8 @@ curl -X POST "http://localhost:5000/api/v1/tickets/$TICKET_ID/comments" \
 curl -X PATCH "http://localhost:5000/api/v1/tickets/$TICKET_ID" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"priority": "URGENT", "title": "Login button broken - urgent"}'
+  -d '{"priority":"URGENT","title":"Login button broken - urgent"}'
 ```
-
----
 
 ### 10. Delete a ticket (admin only)
 
@@ -455,26 +446,25 @@ curl -X DELETE "http://localhost:5000/api/v1/tickets/$TICKET_ID" \
 
 ## 📊 Logging
 
-All logs are written to the `logs/` directory in JSON format:
+All logs are written to `Backend/logs/` in JSON format:
 
-- **`logs/combined.log`** — All log levels (info, warn, error)
+- **`logs/combined.log`** — All log levels
 - **`logs/error.log`** — Error level only
 
-### Log format:
+### Domain event log:
 ```json
 {
   "level": "info",
   "message": "TICKET_CREATED",
   "service": "ticket-management-api",
   "type": "domain_event",
-  "action": "TICKET_CREATED",
   "ticketId": "660f9511-...",
   "actorId": "550e8400-...",
-  "timestamp": "2025-03-01T09:02:00.050+00:00"
+  "timestamp": "2026-02-27T12:00:00.000Z"
 }
 ```
 
-### Request log format:
+### HTTP request log:
 ```json
 {
   "level": "info",
@@ -485,7 +475,7 @@ All logs are written to the `logs/` directory in JSON format:
   "statusCode": 201,
   "durationMs": 52,
   "userId": "550e8400-...",
-  "timestamp": "2025-03-01T09:02:00.000+00:00"
+  "timestamp": "2026-02-27T12:00:00.000Z"
 }
 ```
 
@@ -497,42 +487,41 @@ All logs are written to the `logs/` directory in JSON format:
 Single Node.js process + PostgreSQL. Suitable for low-to-medium traffic.
 
 ### Horizontal Scaling
-- The API is **stateless** (JWTs, no server-side sessions), so multiple instances can run behind a load balancer (nginx, AWS ALB) without sticky sessions.
-- Docker Compose can be swapped for **Kubernetes** with a Deployment + HPA for auto-scaling.
+- The API is **stateless** (JWTs, no server-side sessions), multiple instances can run behind a load balancer without sticky sessions.
+- Docker Compose can be swapped for **Kubernetes** with a Deployment + HPA.
 
 ### Caching
-- Add **Redis** to cache frequent read-heavy queries (e.g. ticket lists, user lookups) using `ioredis`. Cache invalidation on write.
-- Session/token blacklisting for logout can also use Redis.
+- Add **Redis** to cache frequent reads (ticket lists, user lookups) via `ioredis`. Invalidate on write.
 
 ### Database
-- **Connection pooling** via Prisma's built-in pool (configurable via `DATABASE_URL` pool params).
-- **Read replicas**: route read queries to replicas, writes to primary.
-- For very high scale, switch to **cursor-based pagination** instead of offset.
+- Prisma's built-in **connection pool**.
+- **Read replicas** for high-read workloads.
+- Switch to **cursor-based pagination** for very large datasets.
 
 ### Message Queue
-- Add **BullMQ + Redis** for async jobs: email notifications on ticket assignment, audit log processing out-of-band.
-
-### Microservices (future)
-- Split into `auth-service`, `ticket-service`, `notification-service` behind an API Gateway (e.g. Kong).
-- Each service can scale independently based on load.
+- **BullMQ + Redis** for async jobs: email notifications on assignment, out-of-band audit log writes.
 
 ---
 
 ## 🏗 Design Decisions
 
-### What was implemented beyond the spec:
-1. **`requestId` middleware** — Each request gets a UUID attached (`x-request-id` header) for log correlation
-2. **Two-stage Dockerfile** (builder + production) — Smaller final image, no dev deps in production
-3. **Health check endpoint** at `/GET /health` — Used by Docker healthcheck
-4. **`/api/docs.json` endpoint** — Exposes raw OpenAPI spec for tooling
-5. **`sanitizeUser` utility** — Centralized to ensure `password` is never leaked in any response path
-6. **Graceful shutdown** — SIGTERM/SIGINT handlers that close HTTP server + DB connection cleanly
+### What was implemented beyond the spec
 
-### TODO (not implemented to stay in timebox):
-- **Refresh tokens** — Currently using 1h access token only. In production, add a `POST /auth/refresh` endpoint with a longer-lived refresh token stored in an httpOnly cookie
-- **Rate limiting** — Could add `express-rate-limit` on auth endpoints
-- **Unit/integration tests** — Skipped due to timebox; repositories and services are structured to be easily testable
-- **Pagination cursor** — Using offset pagination; cursor-based would be better for large datasets
+1. **`requestId` middleware** — UUID per request attached as `x-request-id` for log correlation
+2. **Two-stage Dockerfile** (builder + production) — Smaller final image, no dev deps in production
+3. **Health check endpoint** at `GET /health` — Used by Docker healthcheck
+4. **`/api/docs.json` endpoint** — Exposes raw OpenAPI spec for tooling
+5. **`sanitizeUser` utility** — Centralized; ensures `password` is never leaked in any response
+6. **Graceful shutdown** — SIGTERM/SIGINT handlers close HTTP server + DB connection cleanly
+7. **React frontend** — Full single-page app with role-scoped views, TanStack Query caching, and Zustand auth
+8. **Admin ticket views** — "My Tickets" (admin's own) vs "All Tickets" (system-wide) with tab switcher
+9. **Creator display** — `GET /tickets` includes full creator object (`id`, `name`, `email`) for all tickets; shown in "All Tickets" admin view
+
+### TODO (not implemented to stay in timebox)
+- **Refresh tokens** — Currently 1h access token only. Production should add `POST /auth/refresh` with httpOnly cookie
+- **Rate limiting** — `express-rate-limit` on auth endpoints
+- **Unit/integration tests** — Repository + service layers are structured to be easily testable
+- **Cursor-based pagination** — Currently using offset; cursor-based is better for large datasets
 
 ---
 
@@ -544,12 +533,11 @@ Single Node.js process + PostgreSQL. Suitable for low-to-medium traffic.
 - Helmet sets secure HTTP headers
 - Generic error messages for auth failures (no user enumeration)
 - Non-root Docker user (`nodejs:1001`)
-- Soft delete — data never permanently lost
+- Soft delete — data is never permanently lost
 
 ---
 
 ## 📖 API Documentation
 
-Swagger UI is available at: **http://localhost:5000/api/docs**
-
-Raw OpenAPI JSON spec: **http://localhost:5000/api/docs.json**
+Swagger UI: **http://localhost:5000/api/docs**  
+Raw OpenAPI JSON: **http://localhost:5000/api/docs.json**

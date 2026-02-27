@@ -48,8 +48,8 @@ export default function TicketDetailPage() {
   if (!ticket) return <ErrorState message="Ticket not found" />;
 
   const comments = commentsData?.data || [];
-  const canEdit = isAdmin || user?.id === ticket.createdBy?.id;
-  const canChangeStatus = isAdmin || user?.id === ticket.createdBy?.id || user?.id === ticket.assignee?.id;
+  const canEdit = isAdmin || user?.id === ticket.creator?.id;
+  const canChangeStatus = isAdmin || user?.id === ticket.creator?.id || user?.id === ticket.assignee?.id;
   const overdue = isOverdue(ticket.dueDate, ticket.status);
 
   const handleAddComment = () => {
@@ -114,7 +114,7 @@ export default function TicketDetailPage() {
               {overdue && <Badge variant="destructive">Overdue</Badge>}
             </div>
             <p className="text-sm text-muted-foreground mt-2">
-              Created by <span className="text-foreground font-medium">{ticket.createdBy?.name}</span> · {formatRelative(ticket.createdAt)}
+              Created by <span className="text-foreground font-medium">{ticket.creator?.name}</span> · {formatRelative(ticket.createdAt)}
             </p>
           </div>
 
@@ -215,7 +215,7 @@ export default function TicketDetailPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Reporter</span>
-                <span className="text-sm text-foreground">{ticket.createdBy?.name}</span>
+                <span className="text-sm text-foreground">{ticket.creator?.name}</span>
               </div>
               {ticket.dueDate && (
                 <div className="flex items-center justify-between">
