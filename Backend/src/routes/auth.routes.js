@@ -1,9 +1,21 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { register, login } from '../controllers/auth.controller.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { registerSchema, loginSchema } from '../validations/auth.validation.js';
 
 const router = Router();
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, message: 'Too many requests, please try again later.' },
+});
+
+router.use(authLimiter);
+
 
 /**
  * @swagger

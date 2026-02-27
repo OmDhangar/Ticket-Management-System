@@ -62,8 +62,18 @@ router.use(authenticate);
  *     responses:
  *       201:
  *         description: Ticket created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data: { $ref: '#/components/schemas/Ticket' }
  *       400:
  *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  *       403:
  *         description: Forbidden
  */
@@ -99,6 +109,19 @@ router.post('/', validate(createTicketSchema), createTicket);
  *     responses:
  *       200:
  *         description: Paginated ticket list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     items:
+ *                       type: array
+ *                       items: { $ref: '#/components/schemas/Ticket' }
+ *                     pagination: { $ref: '#/components/schemas/Pagination' }
  */
 router.get('/', validate(ticketQuerySchema, 'query'), getTickets);
 
@@ -118,6 +141,13 @@ router.get('/', validate(ticketQuerySchema, 'query'), getTickets);
  *     responses:
  *       200:
  *         description: Ticket detail with comments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data: { $ref: '#/components/schemas/Ticket' }
  *       404:
  *         description: Ticket not found
  */
@@ -150,6 +180,13 @@ router.get('/:id', getTicket);
  *     responses:
  *       200:
  *         description: Ticket updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data: { $ref: '#/components/schemas/Ticket' }
  *       403:
  *         description: Forbidden
  */
@@ -235,7 +272,7 @@ router.post('/:id/status', validate(updateStatusSchema), updateStatus);
  *         required: true
  *         schema: { type: string, format: uuid }
  *     responses:
- *       200:
+ *       204:
  *         description: Ticket deleted
  *       403:
  *         description: Admin only

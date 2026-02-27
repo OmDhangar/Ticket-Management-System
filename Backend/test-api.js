@@ -290,8 +290,7 @@ async function run() {
             console.log(`   Status : ${status}`);
         }
 
-        {
-            // Change status
+        {   // POST /tickets/:id/status — change status description (admin or creator/assignee)
             const { status, body } = await req('POST', `/tickets/${ticketId}/status`, {
                 token: userToken,
                 body: { status: 'IN_PROGRESS' },
@@ -353,14 +352,13 @@ async function run() {
         }
 
         {
-            // Delete — admin token (may be 403 if both users are USER role in fresh DB)
-            const { status, body } = await req('DELETE', `/tickets/${ticketId}`,
+            const { status } = await req('DELETE', `/tickets/${ticketId}`,
                 { token: adminToken });
-            const ok = [200, 403].includes(status);
+            const ok = [204, 403].includes(status);
             if (!ok) failed++;
             else passed++;
             const icon = ok ? `${clr.green}✔` : `${clr.red}✘`;
-            console.log(`\n${icon} ${clr.green}${clr.bold}DELETE /tickets/:id — admin token (200 or 403)${clr.reset}`);
+            console.log(`\n${icon} ${clr.green}${clr.bold}DELETE /tickets/:id — admin token (204 or 403)${clr.reset}`);
             console.log(`   Status : ${status}`);
         }
     }

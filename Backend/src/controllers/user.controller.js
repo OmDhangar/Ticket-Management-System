@@ -1,6 +1,10 @@
 import { getAllUsers, getUserById } from '../services/user.service.js';
-import { sendSuccess } from '../utils/response.js';
-import { parsePagination } from '../utils/response.js';
+import { sendSuccess, parsePagination } from '../utils/response.js';
+
+export const getMe = (req, res) => {
+    return sendSuccess(res, 200, 'Profile retrieved successfully.', req.user);
+};
+
 
 /**
  * GET /api/v1/users

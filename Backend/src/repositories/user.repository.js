@@ -1,6 +1,5 @@
 import prisma from '../config/database.js';
 
-// Fields to select by default (never return password)
 const safeUserSelect = {
     id: true,
     email: true,

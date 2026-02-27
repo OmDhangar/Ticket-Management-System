@@ -20,7 +20,7 @@ const PORT = config.port;
 
 async function startServer() {
     try {
-        // Test DB connection
+        // DB connection
         await prisma.$connect();
         logger.info('✅ Database connection established', {
             environment: config.nodeEnv,
@@ -35,11 +35,9 @@ async function startServer() {
             });
         });
 
-        // ─────────────────────────────────────────
-        // Graceful Shutdown
-        // ─────────────────────────────────────────
+        // Shutdown
         const shutdown = async (signal) => {
-            logger.info(`${signal} received. Starting graceful shutdown...`);
+            logger.info(`${signal} received. Starting shutdown...`);
 
             server.close(async () => {
                 logger.info('HTTP server closed.');

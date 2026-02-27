@@ -16,7 +16,6 @@ import { config } from '../config/env.js';
  * - Unhandled errors → 500
  */
 export const globalErrorHandler = (err, req, res, next) => {
-    // Log all errors with structured context
     logger.error('Unhandled error', {
         requestId: req.requestId,
         method: req.method,
@@ -27,7 +26,6 @@ export const globalErrorHandler = (err, req, res, next) => {
         name: err.name,
     });
 
-    // Zod validation errors (shouldn't usually reach here if validate middleware is used)
     if (err instanceof ZodError) {
         const errors = err.errors.map((e) => ({
             field: e.path.join('.'),

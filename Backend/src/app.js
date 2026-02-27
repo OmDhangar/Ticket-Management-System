@@ -14,9 +14,7 @@ import ticketRoutes from './routes/ticket.routes.js';
 
 const app = express();
 
-// ─────────────────────────────────────────
 // Security Middleware
-// ─────────────────────────────────────────
 app.use(helmet());
 app.use(
     cors({
@@ -27,21 +25,15 @@ app.use(
     })
 );
 
-// ─────────────────────────────────────────
 // Request Parsing
-// ─────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// ─────────────────────────────────────────
 // Request Logging Middleware
-// ─────────────────────────────────────────
 app.use(requestIdMiddleware);
 app.use(requestLoggerMiddleware);
 
-// ─────────────────────────────────────────
 // Swagger UI
-// ─────────────────────────────────────────
 app.use(
     '/api/docs',
     swaggerUi.serve,
@@ -59,9 +51,7 @@ app.get('/api/docs.json', (req, res) => {
     res.json(swaggerSpec);
 });
 
-// ─────────────────────────────────────────
 // Health Check
-// ─────────────────────────────────────────
 app.get('/health', (req, res) => {
     res.json({
         success: true,
@@ -71,16 +61,12 @@ app.get('/health', (req, res) => {
     });
 });
 
-// ─────────────────────────────────────────
 // API Routes
-// ─────────────────────────────────────────
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/tickets', ticketRoutes);
 
-// ─────────────────────────────────────────
 // Error Handlers (must be LAST)
-// ─────────────────────────────────────────
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 

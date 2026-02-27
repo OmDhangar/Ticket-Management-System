@@ -1,6 +1,6 @@
-# 🎫 Ticket Management System — Backend API
+# 🎫 Ticket Management System
 
-A production-ready REST API for a Ticket Management System built with **Node.js 20**, **Express**, **PostgreSQL**, and **Prisma ORM**.
+A full-stack Ticket Management System with a production-ready REST API (Node.js, Express, PostgreSQL, Prisma) and a React frontend.
 
 ---
 
@@ -11,11 +11,13 @@ A production-ready REST API for a Ticket Management System built with **Node.js 
 - [Project Structure](#-project-structure)
 - [Environment Variables](#-environment-variables)
 - [Running Locally](#-running-locally)
+- [Frontend Setup](#-frontend-setup)
 - [Running with Docker](#-running-with-docker)
 - [Seeded Credentials](#-seeded-credentials)
 - [API Endpoints](#-api-endpoints)
 - [Sample cURL Requests](#-sample-curl-requests)
 - [Logging](#-logging)
+- [Scalability](#-scalability)
 - [Design Decisions](#-design-decisions)
 
 ---
@@ -187,7 +189,34 @@ Swagger UI: **http://localhost:5000/api/docs**
 
 ---
 
-## 🐳 Running with Docker
+## 🖥 Frontend Setup
+
+### Prerequisites
+- Node.js 18+
+
+### Steps
+
+```bash
+# From the repo root
+cd Frontend
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# The default .env.example already points at the backend:
+# VITE_API_URL=http://localhost:5000/api/v1
+
+# Start development server
+npm run dev
+```
+
+The UI will be available at: **http://localhost:8080**
+
+Log in with the seeded credentials (see below). A regular user can register, create tickets, update their own tickets, and add comments. Admin features (assign, delete, user list) require the ADMIN role.
+
+---
 
 No local PostgreSQL needed — everything runs in containers.
 
@@ -459,6 +488,33 @@ All logs are written to the `logs/` directory in JSON format:
   "timestamp": "2025-03-01T09:02:00.000+00:00"
 }
 ```
+
+---
+
+## 📈 Scalability
+
+### Current Architecture
+Single Node.js process + PostgreSQL. Suitable for low-to-medium traffic.
+
+### Horizontal Scaling
+- The API is **stateless** (JWTs, no server-side sessions), so multiple instances can run behind a load balancer (nginx, AWS ALB) without sticky sessions.
+- Docker Compose can be swapped for **Kubernetes** with a Deployment + HPA for auto-scaling.
+
+### Caching
+- Add **Redis** to cache frequent read-heavy queries (e.g. ticket lists, user lookups) using `ioredis`. Cache invalidation on write.
+- Session/token blacklisting for logout can also use Redis.
+
+### Database
+- **Connection pooling** via Prisma's built-in pool (configurable via `DATABASE_URL` pool params).
+- **Read replicas**: route read queries to replicas, writes to primary.
+- For very high scale, switch to **cursor-based pagination** instead of offset.
+
+### Message Queue
+- Add **BullMQ + Redis** for async jobs: email notifications on ticket assignment, audit log processing out-of-band.
+
+### Microservices (future)
+- Split into `auth-service`, `ticket-service`, `notification-service` behind an API Gateway (e.g. Kong).
+- Each service can scale independently based on load.
 
 ---
 
