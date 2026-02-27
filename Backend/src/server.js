@@ -21,10 +21,6 @@ const PORT = process.env.PORT || config.port || 5000;
 async function startServer() {
     try {
         // DB connection
-        console.log("🔍 Starting server...");
-        console.log("PORT =", PORT);
-        console.log("DATABASE_URL exists =", !!process.env.DATABASE_URL);
-
         await prisma.$connect();
         logger.info('✅ Database connection established', {
             environment: config.nodeEnv,
