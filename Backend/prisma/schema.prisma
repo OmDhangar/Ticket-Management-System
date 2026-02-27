@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ticketsCreated Ticket[] @relation("CreatedTickets")
+  ticketsAssigned Ticket[] @relation("AssignedTickets")
+  comments      Comment[]
+  auditLogs     AuditLog[]
+
+  @@map("user")
+}
+
+model Ticket {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  status      TicketStatus @default(OPEN)
+  priority    Priority   @default(MEDIUM)
+  creatorId   String
+  assigneeId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  dueDate     DateTime?
+  isDeleted   Boolean    @default(false)
+
+  creator    User     @relation("CreatedTickets", fields: [creatorId], references: [id])
+  assignee   User?    @relation("AssignedTickets", fields: [assigneeId], references: [id])
+  comments   Comment[]
+  auditLogs  AuditLog[]
+
+  @@map("ticket")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  ticketId  String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  ticket  Ticket @relation(fields: [ticketId], references: [id])
+  author  User   @relation(fields: [authorId], references: [id])
+
+  @@map("comment")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  ticketId  String?
+  actorId   String?
+  action    String
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  ticket Ticket? @relation(fields: [ticketId], references: [id])
+  actor  User?   @relation(fields: [actorId], references: [id])
+
+  @@map("audit_log")
+}
